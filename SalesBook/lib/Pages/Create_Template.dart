@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Model/Template_Data.dart';
 import 'package:flutter_application_1/Pages/PreviewCreate_Template.dart';
+import 'package:flutter_application_1/Provider/DataSource_Provider.dart';
+import 'package:provider/provider.dart';
 
 import 'package:uuid/uuid.dart';
 
@@ -11,7 +14,7 @@ class CreateTemplateScreen extends StatefulWidget {
 class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
   final _formKey = GlobalKey<FormState>();
   String jsonData = "";
-  List<TemplateData> templateDatas = [];
+  List<TemplateData> _templateDatas = [];
   String? _selectedType;
   String? _label;
   String? _hint;
@@ -19,16 +22,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
   bool? _isMandatory = false;
   int _sequenceNumber = 1;
 
-  final List<AvailableDataSource> availableDataSources = [
-    AvailableDataSource(code: 'ds1', name: 'True'),
-    AvailableDataSource(code: 'ds2', name: 'False'),
-    // AvailableDataSource(code: 'ds2', name: 'Male'),
-    // AvailableDataSource(code: 'ds4', name: 'Female'),
-    // AvailableDataSource(code: 'ds5', name: 'yes'),
-    // AvailableDataSource(code: 'ds6', name: 'No'),
-    // Add more data sources as needed
-  ];
-
+  bool? _selectedValue;
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -109,29 +103,34 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        DropdownButtonFormField<String>(
-                          hint: Text('Select Dropdown Type'),
-                          items: availableDataSources
-                              .map((AvailableDataSource source) {
-                            return DropdownMenuItem<String>(
-                              value: source.code ?? '',
-                              child: Text(source.name ?? ''),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) async {
-                            _dataSource = newValue;
-                          },
-                          validator: (value) => value == null
-                              ? 'Please select a dropdown type'
-                              : null,
-                        ),
+                        Container(
+                          child: DropdownButton<bool>(
+                            hint: Text('Select dropdown'),
+                            value: _selectedValue,
+                            items: [
+                              DropdownMenuItem<bool>(
+                                value: true,
+                                child: Text('True'),
+                              ),
+                              DropdownMenuItem<bool>(
+                                value: false,
+                                child: Text('False'),
+                              ),
+                            ],
+                            onChanged: (bool? newValue) {
+                              setState(() {
+                                _selectedValue = newValue;
+                              });
+                            },
+                          ),
+                        )
                       ],
                     ),
                   ElevatedButton(
                     onPressed: _addFormElement,
                     child: Text('Add Field'),
                   ),
-                  if (templateDatas.isNotEmpty)
+                  if (_templateDatas.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -143,7 +142,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
                         ReorderableListView(
                           shrinkWrap: true,
                           onReorder: _onReorder,
-                          children: templateDatas.asMap().entries.map((entry) {
+                          children: _templateDatas.asMap().entries.map((entry) {
                             int index = entry.key;
                             TemplateData e = entry.value;
                             return ListTile(
@@ -160,7 +159,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
                         ),
                       ],
                     ),
-                  SizedBox(height: 20),
+                  // SizedBox(height: 20),
                   // ElevatedButton(
                   //   onPressed: () {
                   //     setState(() {
@@ -171,17 +170,15 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
                   // ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      // Handle preview navigation without DataSourceProvider
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PreviewCreateTemplateScreen(),
-                        ),
-                      );
-                    },
-                    child: Text('Preview'),
-                  ),
+                      onPressed: () {
+                        Provider.of<DatasourceProvider>(context, listen: false)
+                            .updateTemplateData(_templateDatas);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PreviewcreateTemplate()));
+                      },
+                      child: Text('Preiview'))
                 ],
               ),
             ),
@@ -208,7 +205,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
       _formKey.currentState!.save();
       var uuid = Uuid();
       setState(() {
-        templateDatas.add(TemplateData(
+        _templateDatas.add(TemplateData(
             id: uuid.v4(),
             sequenceNumber:
                 _sequenceNumber.toString(), // Using sequence number as key
@@ -234,12 +231,12 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
 
   void _deleteFormElement(int index) {
     setState(() {
-      templateDatas.removeAt(index);
+      _templateDatas.removeAt(index);
       // Adjust the sequence number after deletion
-      for (int i = 0; i < templateDatas.length; i++) {
-        templateDatas[i].sequenceNumber = (i + 1).toString();
+      for (int i = 0; i < _templateDatas.length; i++) {
+        _templateDatas[i].sequenceNumber = (i + 1).toString();
       }
-      _sequenceNumber = templateDatas.length + 1;
+      _sequenceNumber = _templateDatas.length + 1;
     });
   }
 
@@ -248,67 +245,13 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
       if (newIndex > oldIndex) {
         newIndex -= 1;
       }
-      final TemplateData item = templateDatas.removeAt(oldIndex);
-      templateDatas.insert(newIndex, item);
+      final TemplateData item = _templateDatas.removeAt(oldIndex);
+      _templateDatas.insert(newIndex, item);
       // Adjust the sequence number after reorder
-      for (int i = 0; i < templateDatas.length; i++) {
-        templateDatas[i].sequenceNumber = (i + 1).toString();
+      for (int i = 0; i < _templateDatas.length; i++) {
+        _templateDatas[i].sequenceNumber = (i + 1).toString();
       }
-      _sequenceNumber = templateDatas.length + 1;
+      _sequenceNumber = _templateDatas.length + 1;
     });
   }
 }
-
-class TemplateData {
-  final String id;
-  String sequenceNumber;
-  final String componentName;
-  final String? label;
-  final String? hint;
-  final bool? mandatory;
-  final String? datasource;
-
-  TemplateData({
-    required this.id,
-    required this.sequenceNumber,
-    required this.componentName,
-    this.label,
-    this.hint,
-    this.mandatory,
-    this.datasource,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'sequenceNumber': sequenceNumber,
-      'componentName': componentName,
-      'label': label,
-      'hint': hint,
-      'mandatory': mandatory,
-      'datasource': datasource,
-    };
-  }
-}
-
-class AvailableDataSource {
-  final String? code;
-  final String? name;
-
-  AvailableDataSource({this.code, this.name});
-}
-
-// class PreviewCreateScreen extends StatelessWidget {
-//   final List<TemplateData> templateDatas;
-
-//   PreviewCreateScreen({required this.templateDatas});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('NotesPage'),
-//       ),
-//     );
-//   }
-// }

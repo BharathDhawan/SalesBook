@@ -1,9 +1,27 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Pages/Create_Template.dart';
 import 'package:flutter_application_1/Pages/Home_Page.dart';
+import 'package:flutter_application_1/Provider/DataSource_Provider.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: FirebaseOptions(
+          apiKey: "AIzaSyAqMT2g-8PP7V6wZxqEfevGi07e4PffVZw",
+          appId: "1:1090160258116:web:db9d41154720a1afce2011",
+          messagingSenderId: "1090160258116",
+          projectId: "propertycrudapp"));
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => DatasourceProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

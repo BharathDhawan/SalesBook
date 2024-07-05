@@ -1,72 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_application_1/Model/Template_Data.dart';
+import 'package:flutter_application_1/Provider/DataSource_Provider.dart';
+import 'package:provider/provider.dart';
 
-class TemplateData {
-  final String componentName;
-  final String label;
-
-  TemplateData({required this.componentName, required this.label});
-}
-
-class PreviewCreateTemplateScreen extends StatelessWidget {
-  final List<TemplateData> templateData = [
-    TemplateData(componentName: 'TextField', label: 'Enter Text'),
-    TemplateData(componentName: 'NumberField', label: 'Enter Number'),
-    TemplateData(
-        componentName: 'PhoneNumberField', label: 'Enter Phone Number'),
-    TemplateData(componentName: 'TextArea', label: 'Enter Description'),
-    // TemplateData(componentName: 'Year', label: 'Select Year'),
-    TemplateData(componentName: 'Dropdown', label: 'Select Option'),
-    TemplateData(componentName: 'CheckboxGroup', label: 'Select Options'),
-    // TemplateData(componentName: 'Filepicker', label: 'Upload File'),
-  ];
+class PreviewcreateTemplate extends StatefulWidget {
+  const PreviewcreateTemplate({super.key});
 
   @override
+  State<PreviewcreateTemplate> createState() => _PreviewcreateTemplateState();
+}
+
+class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
+  @override
   Widget build(BuildContext context) {
-    List<Widget> formWidgets = buildFormWidgets(context, templateData);
+    final dataSourceProvider = Provider.of<DatasourceProvider>(context);
+
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    List<Widget> formWidgets = generateFormWidgets(dataSourceProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('NotesPage'),
+        title: Text('Preview Form'),
       ),
-      body: ListView(
-        padding: EdgeInsets.all(16.0),
-        children: formWidgets,
+      body: Center(
+        child: SizedBox(
+          height: height,
+          width: width * 0.5,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Form(
+              child: Scrollbar(
+                child: ListView(
+                  children: formWidgets,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  List<Widget> buildFormWidgets(
-      BuildContext context, List<TemplateData> templateData) {
+  List<Widget> generateFormWidgets(DatasourceProvider dataSourceProvider) {
     List<Widget> formWidgets = [];
+    const double labelWidth = 150.0;
 
-    for (var element in templateData) {
+    for (var element in dataSourceProvider.templateDatas) {
       switch (element.componentName) {
         case 'TextField':
         case 'NumberField':
         case 'PhoneNumberField':
         case 'TextArea':
           formWidgets.add(
-            buildTextField(element),
+            buildTextField(element, labelWidth),
           );
           break;
-        case 'Year':
-          formWidgets.add(
-            buildYearDropdown(element),
-          );
-          break;
-        case 'Dropdown':
-          formWidgets.add(
-            buildDropdownWidget(element),
-          );
-          break;
-        case 'CheckboxGroup':
-          formWidgets.add(
-            buildCheckboxGroupWidget(element),
-          );
-          break;
-        // case 'Filepicker':
-        //   formWidgets.add(buildFilePicker(element));
+
+        // case 'Dropdown':
+        //   buildDropdown(element, dataSourceProvider);
+        //   formWidgets.add(
+        //     buildDropdownWidget(element, labelWidth),
+        //   );
         //   break;
+        // case 'CheckboxGroup':
+        //   buildCheckboxGroup(element, dataSourceProvider);
+        //   formWidgets.add(
+        //     buildCheckboxGroupWidget(element),
+        //   );
+        //   break;
+
         default:
           formWidgets.add(
             Padding(
@@ -76,138 +80,138 @@ class PreviewCreateTemplateScreen extends StatelessWidget {
           );
       }
     }
-
     formWidgets.add(ElevatedButton(
-      onPressed: () => _showPopup(context),
-      child: Text("Save"),
-    ));
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Text("Save")));
     formWidgets.add(SizedBox(height: 20));
     formWidgets.add(ElevatedButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      child: Text("Cancel"),
-    ));
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Text("Cancel")));
 
     return formWidgets;
   }
 
-  Widget buildTextField(TemplateData element) {
+  Padding buildTextField(TemplateData element, double labelWidth) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        keyboardType: element.componentName == 'NumberField'
-            ? TextInputType.number
-            : element.componentName == 'PhoneNumberField'
-                ? TextInputType.phone
-                : TextInputType.text,
-        maxLines: element.componentName == 'TextArea' ? 4 : 1,
-        decoration: InputDecoration(
-          labelText: element.label,
-        ),
-      ),
-    );
-  }
-
-  Widget buildYearDropdown(TemplateData element) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: DropdownButtonFormField<int>(
-        decoration: InputDecoration(
-          labelText: element.label,
-        ),
-        items: List.generate(
-          50,
-          (index) => DropdownMenuItem(
-            value: 1970 + index,
-            child: Text((1970 + index).toString()),
-          ),
-        ),
-        onChanged: (newValue) {},
-      ),
-    );
-  }
-
-  Widget buildDropdownWidget(TemplateData element) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          labelText: element.label,
-        ),
-        items: <String>['Option 1', 'Option 2', 'Option 3'].map((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-        onChanged: (newValue) {},
-      ),
-    );
-  }
-
-  Widget buildCheckboxGroupWidget(TemplateData element) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(element.label),
-          CheckboxListTile(
-            title: Text('Option 1'),
-            value: false,
-            onChanged: (newValue) {},
-          ),
-          CheckboxListTile(
-            title: Text('Option 2'),
-            value: false,
-            onChanged: (newValue) {},
-          ),
-          CheckboxListTile(
-            title: Text('Option 3'),
-            value: false,
-            onChanged: (newValue) {},
+          Expanded(
+            child: TextFormField(
+              decoration: InputDecoration(
+                  label: Text(element.label ?? ''),
+                  hintText: element.hint ?? '',
+                  // Padding inside the text field
+                  border: element.componentName == 'TextArea'
+                      ? OutlineInputBorder()
+                      : UnderlineInputBorder()),
+              keyboardType: element.componentName == 'NumberField'
+                  ? TextInputType.number
+                  : element.componentName == 'PhoneNumberField'
+                      ? TextInputType.phone
+                      : TextInputType.text,
+              inputFormatters: element.componentName == 'NumberField' ||
+                      element.componentName == 'PhoneNumberField'
+                  ? [FilteringTextInputFormatter.digitsOnly]
+                  : null,
+              maxLines: element.componentName == 'TextArea' ? 3 : 1,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget buildFilePicker(TemplateData element) {
+  Padding buildNumberField(TemplateData element, double labelWidth) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ElevatedButton(
-        onPressed: () {
-          // Implement file picker logic here
-        },
-        child: Text(element.label),
+      child: Row(
+        children: [
+          ConstrainedBox(
+            constraints:
+                BoxConstraints(minWidth: labelWidth, maxWidth: labelWidth),
+            child: Text(
+              element.label ?? '',
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ),
+          SizedBox(width: 20),
+          Expanded(
+            child: TextFormField(
+              decoration: InputDecoration(
+                hintText: element.hint ?? '',
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  void _showPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Form Submitted"),
-          content: Text("Your form has been saved."),
-          actions: <Widget>[
-            TextButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+  Padding buildPhoneNumberField(TemplateData element, double labelWidth) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          ConstrainedBox(
+            constraints:
+                BoxConstraints(minWidth: labelWidth, maxWidth: labelWidth),
+            child: Text(
+              element.label ?? '',
+              style: TextStyle(fontSize: 16.0),
             ),
-          ],
-        );
-      },
+          ),
+          SizedBox(width: 20),
+          Expanded(
+            child: TextFormField(
+              decoration: InputDecoration(
+                hintText: element.hint ?? '',
+              ),
+              keyboardType: TextInputType.phone,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+          ),
+        ],
+      ),
     );
   }
-}
 
-void main() {
-  runApp(MaterialApp(
-    home: PreviewCreateTemplateScreen(),
-  ));
+  Padding buildTextArea(TemplateData element, double labelWidth) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ConstrainedBox(
+            constraints:
+                BoxConstraints(minWidth: labelWidth, maxWidth: labelWidth),
+            child: Text(
+              element.label ?? '',
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ),
+          SizedBox(width: 20),
+          Expanded(
+            child: TextFormField(
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: element.hint ?? '',
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
