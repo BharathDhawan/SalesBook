@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Pages/Create_Template.dart';
 import 'package:flutter_application_1/Pages/Home_Page.dart';
+import 'package:flutter_application_1/Pages/Save_Template.dart';
 import 'package:flutter_application_1/Provider/DataSource_Provider.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/homepage': (context) => HomePage(),
         '/create_template': (context) => CreateTemplateScreen(),
+        '/saved_template': (context) => SaveTemplate()
       },
     );
   }

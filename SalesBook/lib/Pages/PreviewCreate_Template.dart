@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Model/Template_Data.dart';
@@ -12,6 +13,9 @@ class PreviewcreateTemplate extends StatefulWidget {
 }
 
 class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
+  final CollectionReference Field =
+      FirebaseFirestore.instance.collection("Fields");
+
   @override
   Widget build(BuildContext context) {
     final dataSourceProvider = Provider.of<DatasourceProvider>(context);
@@ -82,6 +86,11 @@ class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
     }
     formWidgets.add(ElevatedButton(
         onPressed: () {
+          // for (var element in dataSourceProvider.templateDatas) {
+          //   dataSourceProvider.addDataToFirestore(element);
+          // }
+          dataSourceProvider
+              .addDataToFirestore(dataSourceProvider.templateDatas);
           Navigator.pop(context);
         },
         child: Text("Save")));

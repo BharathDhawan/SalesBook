@@ -20,6 +20,13 @@ class HomePage extends StatelessWidget {
               },
               child: Text('Property Page'),
             ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/saved_template');
+            },
+            child: Text('Saved Templates'),
+          ),
         ])));
   }
 }
