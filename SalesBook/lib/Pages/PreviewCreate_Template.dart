@@ -121,7 +121,11 @@ class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
                 child: Text('Save'),
                 onPressed: () {
                   _saveTemplate(dataSourceProvider, brandName.text);
-                  Navigator.pop(context);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/homepage',
+                    (route) => false,
+                  );
                 }),
             TextButton(
               child: Text('Cancel'),
