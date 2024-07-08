@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/Model/TemplateResponseModel.dart';
 import 'package:flutter_application_1/Model/Template_Data.dart';
 import 'package:flutter_application_1/Provider/DataSource_Provider.dart';
 import 'package:provider/provider.dart';
@@ -86,12 +89,7 @@ class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
     }
     formWidgets.add(ElevatedButton(
         onPressed: () {
-          // for (var element in dataSourceProvider.templateDatas) {
-          //   dataSourceProvider.addDataToFirestore(element);
-          // }
-          dataSourceProvider
-              .addDataToFirestore(dataSourceProvider.templateDatas);
-          Navigator.pop(context);
+          _showPopup(context, dataSourceProvider);
         },
         child: Text("Save")));
     formWidgets.add(SizedBox(height: 20));
@@ -102,6 +100,54 @@ class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
         child: Text("Cancel")));
 
     return formWidgets;
+  }
+
+  void _showPopup(BuildContext context, DatasourceProvider dataSourceProvider) {
+    TextEditingController brandName = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text('Give Your Template Name.'),
+          actions: <Widget>[
+            TextFormField(
+              controller: brandName,
+              decoration: InputDecoration(
+                labelText: 'Template Name',
+                hintText: 'Enter template name',
+              ),
+            ),
+            TextButton(
+                child: Text('Save'),
+                onPressed: () {
+                  _saveTemplate(dataSourceProvider, brandName.text);
+                  Navigator.pop(context);
+                }),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _saveTemplate(
+      DatasourceProvider dataSourceProvider, String text) async {
+    String templateData = jsonEncode(
+        dataSourceProvider.templateDatas.map((e) => e.toJson()).toList());
+
+    TemplateRequestModel newTemplate =
+        TemplateRequestModel(label: text, templateData: templateData);
+
+    final String jsonBody = jsonEncode(newTemplate.toJson());
+
+    await dataSourceProvider.addDataToFirestore(text, jsonBody);
+
+    print('Template saved successfully to Firestore.');
   }
 
   Padding buildTextField(TemplateData element, double labelWidth) {

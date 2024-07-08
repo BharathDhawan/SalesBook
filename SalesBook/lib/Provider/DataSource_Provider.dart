@@ -14,10 +14,16 @@ class DatasourceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addDataToFirestore(List<TemplateData> data) async {
-    List<Map<String, dynamic>> jsonData = data.map((e) => e.toJson()).toList();
-    await FirebaseFirestore.instance.collection('Fields').add({
-      'data': jsonEncode(jsonData),
+  Future<void> addDataToFirestore(String headers, String jsonBody) async {
+    DocumentReference docRef =
+        await FirebaseFirestore.instance.collection('Fields').add({
+      'templateData': jsonBody,
+    });
+
+    // Update the document with the generated ID
+    await docRef.update({
+      'id': docRef.id,
+      'Label': headers,
     });
   }
 

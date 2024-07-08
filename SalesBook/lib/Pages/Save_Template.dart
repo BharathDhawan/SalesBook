@@ -92,7 +92,7 @@ class _SaveTemplateState extends State<SaveTemplate> {
                 itemCount: templates.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(templates[index].name ?? ''),
+                    title: Text(templates[index].label ?? ''),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -127,7 +127,7 @@ class _SaveTemplateState extends State<SaveTemplate> {
     );
   }
 
-  Future<void> deleteTemplate(int? id) async {
+  Future<void> deleteTemplate(String? id) async {
     if (id != null) {
       // ApiService.deleteTemplate(id.toString());
       setState(() {
