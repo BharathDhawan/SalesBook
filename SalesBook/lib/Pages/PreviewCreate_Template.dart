@@ -149,7 +149,7 @@ class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
 
     final String jsonBody = jsonEncode(newTemplate.toJson());
 
-    await dataSourceProvider.addDataToFirestore(text, jsonBody);
+    await dataSourceProvider.addDataToFirestore(jsonBody);
 
     print('Template saved successfully to Firestore.');
   }

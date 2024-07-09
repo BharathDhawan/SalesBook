@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:js_interop';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -14,17 +15,15 @@ class DatasourceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addDataToFirestore(String headers, String jsonBody) async {
+  Future<void> addDataToFirestore(String jsonBody) async {
+    // Parse the JSON string into a Dart Map
+    Map<String, dynamic> data = jsonDecode(jsonBody);
+
     DocumentReference docRef =
-        await FirebaseFirestore.instance.collection('Fields').add({
-      'templateData': jsonBody,
-    });
+        await FirebaseFirestore.instance.collection('Fields').add(data);
 
     // Update the document with the generated ID
-    await docRef.update({
-      'id': docRef.id,
-      'Label': headers,
-    });
+    await docRef.update({'id': docRef.id});
   }
 
   Future<void> fetchDataFromFirestore() async {
@@ -47,9 +46,7 @@ class DatasourceProvider extends ChangeNotifier {
   //   try{
   //      final CollectionReference collectionReference= FirebaseFirestore.instance.collection('Fields');
   //      await collectionReference.get().then((querysnapshot){
-
-  //      }
-
+  //       }
   //      )
   //   }
   // }
