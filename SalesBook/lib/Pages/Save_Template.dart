@@ -129,6 +129,9 @@ class _SaveTemplateState extends State<SaveTemplate> {
 
   Future<void> deleteTemplate(String? id) async {
     if (id != null) {
+      setState(() {
+        templates.removeWhere((template) => template.id == id);
+      });
       await FirebaseFirestore.instance.collection('Fields').doc(id).delete();
     }
   }
