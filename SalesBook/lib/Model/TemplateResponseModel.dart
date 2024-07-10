@@ -22,7 +22,7 @@ class TemplateResponseModel {
   String? label;
   String? templateData;
 
-  TemplateResponseModel({this.label, this.templateData});
+  TemplateResponseModel({this.label, this.templateData, this.id});
 
   TemplateResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];

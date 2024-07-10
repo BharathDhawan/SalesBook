@@ -178,7 +178,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
                             MaterialPageRoute(
                                 builder: (context) => PreviewcreateTemplate()));
                       },
-                      child: Text('Preiview'))
+                      child: Text('Preview'))
                 ],
               ),
             ),

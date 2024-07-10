@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Model/TemplateResponseModel.dart';
+import 'package:flutter_application_1/Pages/Edit_TemplatePage.dart';
 import 'package:flutter_application_1/Provider/DataSource_Provider.dart';
 import 'package:provider/provider.dart';
 
@@ -99,14 +100,14 @@ class _SaveTemplateState extends State<SaveTemplate> {
                         IconButton(
                           icon: const Icon(Icons.edit),
                           onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => EditTemplatePage(
-                            //       template: templates[index],
-                            //     ),
-                            //   ),
-                            // );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditTemplatePage(
+                                  template: templates[index],
+                                ),
+                              ),
+                            );
                           },
                         ),
                         IconButton(

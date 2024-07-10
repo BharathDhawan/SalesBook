@@ -54,7 +54,7 @@ class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
     List<Widget> formWidgets = [];
     const double labelWidth = 150.0;
 
-    for (var element in dataSourceProvider.templateDatas) {
+    for (var element in dataSourceProvider.templateData) {
       switch (element.componentName) {
         case 'TextField':
         case 'NumberField':
@@ -142,7 +142,7 @@ class _PreviewcreateTemplateState extends State<PreviewcreateTemplate> {
   Future<void> _saveTemplate(
       DatasourceProvider dataSourceProvider, String text) async {
     String templateData = jsonEncode(
-        dataSourceProvider.templateDatas.map((e) => e.toJson()).toList());
+        dataSourceProvider.templateData.map((e) => e.toJson()).toList());
 
     TemplateRequestModel newTemplate =
         TemplateRequestModel(label: text, templateData: templateData);
